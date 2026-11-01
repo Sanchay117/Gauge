@@ -7,6 +7,8 @@ MIN_JUMP_PX = 15
 MAX_REJECTED_RUN = 3
 MIN_HOLD_SECONDS = 0.15
 MAX_TURN_SECONDS = 0.5
+ARC_TOLERANCE = 0.03
+MIN_ARC_SAMPLES = 12
 
 
 @dataclass
@@ -104,6 +106,38 @@ def active_window(series: Series, axis: str) -> tuple[float, float]:
     if best_len < 4:
         return float(series.t[0]), float(series.t[-1])
     return float(series.t[best_start]), float(series.t[best_start + best_len - 1])
+
+
+def _arc_rms(t: np.ndarray, values: np.ndarray) -> float:
+    return float(np.sqrt(np.mean((values - np.polyval(np.polyfit(t, values, 2), t)) ** 2)))
+
+
+def flight_window(series: Series, axis: str) -> tuple[float, float]:
+    """Find the longest parabolic arc around the highest point, ignoring walking and landing."""
+    t, values = series.t, series.axis(axis)
+    limit = ARC_TOLERANCE * float(np.ptp(values))
+    apex = int(np.argmax(values))
+    best = (0, len(t) - 1)
+    best_len = 0
+    for left in range(apex, -1, -1):
+        for right in range(len(t) - 1, apex, -1):
+            if right - left + 1 <= max(best_len, MIN_ARC_SAMPLES - 1):
+                break
+            if _arc_rms(t[left:right + 1], values[left:right + 1]) <= limit:
+                best, best_len = (left, right), right - left + 1
+                break
+    return float(t[best[0]]), float(t[best[1]])
+
+
+def motion_window(series: Series, axis: str) -> tuple[float, float]:
+    """The active window, narrowed to the flight when it holds more than one arc."""
+    start, end = active_window(series, axis)
+    part = series.window(start, end)
+    if len(part.t) >= MIN_ARC_SAMPLES:
+        values = part.axis(axis)
+        if _arc_rms(part.t, values) > ARC_TOLERANCE * float(np.ptp(values)):
+            return flight_window(part, axis)
+    return start, end
 
 
 def quality_warnings(series: Series, axis: str, total_frames: int) -> list[str]:

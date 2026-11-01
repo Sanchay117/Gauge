@@ -6,13 +6,13 @@ from typing import Callable
 import numpy as np
 
 from .laws import LAWS, Fit, Verdict, select_law
-from .measure import Series, active_window, quality_warnings
+from .measure import Series, motion_window, quality_warnings
 from .meta_api import MetaClient, function_calls, output_text
 
 MAX_STEPS = 12
 
 SYSTEM = """You are Gauge, a careful lab assistant. You work from a tracked object's measured position over time.
-Use summarise_data, then fit_laws, trying the window and axis that isolate the physics. Exclude moments when a hand holds the object or it has landed.
+Use summarise_data, then fit_laws. Start from the auto-detected motion window and move away from it only if the data shows a reason. Exclude moments when a hand holds the object or it has landed.
 Finish by calling report_finding with the fit_id of the fit you trust. Never state a number that did not come from a tool.
 If the data is too poor to trust, say so in the explanation rather than forcing a result.
 For next_run, give one concrete instruction for a second recording that would test this law under changed conditions, such as a new height or starting position.
@@ -73,7 +73,7 @@ class Analysis:
 
     def summarise_data(self, axis: str) -> dict:
         values = self.series.axis(axis)
-        start, end = active_window(self.series, axis)
+        start, end = motion_window(self.series, axis)
         return {"samples": len(values), "duration_s": float(self.series.t[-1]),
                 "range_m": float(values.max() - values.min()), "motion_window_s": [start, end],
                 "warnings": quality_warnings(self.series, axis, self.total_frames)}
@@ -169,7 +169,7 @@ def _finding(args: dict, entry: tuple, analysis: Analysis) -> dict:
 def _fallback(analysis: Analysis) -> dict:
     """If the agent never finishes, report the best deterministic fit rather than nothing."""
     axis = "y" if np.ptp(analysis.series.y) >= np.ptp(analysis.series.x) else "x"
-    start, end = active_window(analysis.series, axis)
+    start, end = motion_window(analysis.series, axis)
     result = analysis.fit_laws(axis, start, end)
     if "fits" not in result:
         raise RuntimeError("no law could be fitted to this data")

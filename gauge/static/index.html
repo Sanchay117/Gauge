@@ -75,7 +75,7 @@
       <div class="drop">
         <div class="row" style="justify-content:center">
           <button id="pick">Choose a video</button>
-          <button id="sample" class="quiet" hidden>Try the sample</button>
+          <button id="sample" class="quiet" hidden>Try the Moon</button>
         </div>
         <input id="file" type="file" accept="video/*" hidden>
         <p class="hint">Phone on a steady surface, with a ruler in frame. Say its length out loud.</p>
@@ -89,6 +89,7 @@
       </div>
       <input id="scrub" type="range" min="0" value="0" aria-label="Frame">
       <p class="hint" id="prompt"></p>
+      <p class="hint" id="sample-note" hidden>Apollo 16 footage from NASA, digitized by Ken Glover. Use the astronaut's backpack as the reference: tap its top and bottom. The stacked life support units are about 0.914 m tall. That size is only known to about 5%, and the error bar below does not include it.</p>
       <ol class="steps" id="steps"></ol>
       <div class="row" id="reference-row" style="margin-top:12px" hidden>
         <label for="metres">Reference length (m)</label>

@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from . import agent
 from .budget import BudgetExceeded, RateLimited, VisitorLimiter, default_ledger
 from .laws import Fit, verify
-from .measure import (Series, active_window, build_series, clean_track, quality_warnings,
+from .measure import (Series, build_series, motion_window, clean_track, quality_warnings,
                       scale_from_reference, scale_uncertainty)
 from .meta_api import MetaClient, point_prompt
 from .video import Clip, extract_wav, nearest_frame, normalise
@@ -258,7 +258,8 @@ def verify_run(run_id: str, body: VerifyRequest) -> dict:
 
     def work():
         axis = first.finding["axis"]
-        start, end = active_window(run.series, axis)
+        # The window is set from run 2 alone, before the law from run 1 is applied.
+        start, end = motion_window(run.series, axis)
         part = run.series.window(start, end)
         verdict = verify(first.fit, part.t - part.t[0], part.axis(axis))
         run.verdict = {**verdict.to_dict(), "warnings": quality_warnings(part, axis, len(part.t)),

@@ -3,7 +3,8 @@ import pytest
 
 from gauge.budget import BudgetExceeded, Ledger, RateLimited, VisitorLimiter, sam_cost
 from gauge.laws import fit_law, select_law, verify
-from gauge.measure import Series, active_window, build_series, clean_track, quality_warnings, scale_from_reference
+from gauge.measure import (Series, active_window, build_series, clean_track, motion_window, quality_warnings,
+                           scale_from_reference)
 from gauge.meta_api import parse_tracks, point_prompt
 
 RNG = np.random.default_rng(7)
@@ -54,6 +55,22 @@ def test_active_window_trims_hold_and_landing():
     start, end = active_window(Series(t, np.zeros(90), y), "y")
     assert 0.45 <= start <= 0.6
     assert 0.9 <= end <= 1.05
+
+
+def test_motion_window_isolates_a_jump_from_walking():
+    t = np.linspace(0, 3, 90)
+    flight = (t > 1) & (t < 2.2)
+    y = 0.05 * np.sin(9 * t) + np.where(flight, 1.3 * (t - 1) - 0.81 * (t - 1) ** 2, 0)
+    start, end = motion_window(Series(t, np.zeros(90), y), "y")
+    assert 0.9 < start < 1.3
+    assert 1.9 < end < 2.3
+
+
+def test_motion_window_leaves_a_clean_toss_alone():
+    t = np.linspace(0, 1, 60)
+    y = 2 * t - 4.9 * t**2
+    start, end = motion_window(Series(t, np.zeros(60), y), "y")
+    assert (start, end) == pytest.approx((0, 1), abs=0.05)
 
 
 def test_active_window_keeps_the_top_of_a_toss():

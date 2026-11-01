@@ -339,10 +339,12 @@ async function upload(file) {
   }
 }
 
-async function loadSample(name) {
+async function loadSample() {
   showError(null);
   try {
-    startRun(await post(`/api/samples/${name}`));
+    startRun(await post(`/api/samples/jump_${state.index + 1}`));
+    $("metres").value = "0.914";
+    $("sample-note").hidden = false;
   } catch (err) {
     $("video-card").hidden = false;
     showError(err.message);
@@ -365,9 +367,9 @@ async function init() {
     $("next").hidden = true;
   };
   const samples = await api("/api/samples").catch(() => []);
-  if (samples.length) {
+  if (samples.includes("jump_1") && samples.includes("jump_2")) {
     $("sample").hidden = false;
-    $("sample").onclick = () => loadSample(samples[0]);
+    $("sample").onclick = loadSample;
   }
 }
 

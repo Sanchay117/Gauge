@@ -54,11 +54,23 @@ The sample `throw` is a ball thrown upward in front of a 75 cm scale, run as run
 
 The throw reads about 5% high against 9.81 m/s². The scale comes from the board, and the ball probably flies in front of it, which would make its motion look larger. Read that figure as a sanity check, not a measurement of gravity.
 
+### Gravity doesn't lie
+
+Stretching time by a factor k divides an acceleration by k², so a slowed video carries the mark of its clock. Gauge measures the throw at real speed, freezes the law, then reads a copy left at 10 times slow motion against it.
+
+| Test | Result |
+| --- | --- |
+| Throw at real speed, run 1 | 10.3 m/s² |
+| Slowed copy, free fit, run 2 | 0.101 m/s² |
+| Reported playback speed of run 2 | 0.10× of run 1, the true slowdown |
+
+The speed is computed in code, and it assumes both clips share one gravity, so it flags a mismatch and does not prove how a clip was edited. Gauge has not been tested on AI generated video.
+
 ## Footage credit
 
-Sample clips are cut from the Apollo 16 jump salute by NASA, digitized by Ken Glover, from the [Apollo Lunar Surface Journal](https://apollojournals.org/alsj/a16/a16salute.mpg). Use here does not imply endorsement by NASA.
+Sample clips are cut from the Apollo 16 jump salute by NASA, digitized by Ken Glover, from the [Apollo Lunar Surface Journal](https://apollojournals.org/alsj/a16/a16salute.mpg). Use here does not imply endorsement by NASA. The narration on `samples/jump_1.mp4` is synthetic speech added for this project with Deepgram, so that the sample can show a spoken length setting the scale.
 
-`samples/throw.mp4` is cut from [Senkrechter Wurf nach oben (Steigzeit)](https://commons.wikimedia.org/wiki/File:Senkrechter_Wurf_nach_oben_(Steigzeit).webm) by Rhetos, recorded at Mathe-AC Lernwerkstatt Aachen, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). It was cropped to the board and restored from 10 times slow motion to real time by `spikes/earth_cut.py`. That sample stays under the same license.
+`samples/throw.mp4` and `samples/throw_slow.mp4` are cut from [Senkrechter Wurf nach oben (Steigzeit)](https://commons.wikimedia.org/wiki/File:Senkrechter_Wurf_nach_oben_(Steigzeit).webm) by Rhetos, recorded at Mathe-AC Lernwerkstatt Aachen, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Both were cropped to the board by `spikes/earth_cut.py`, and `throw.mp4` was also restored from 10 times slow motion to real time. These samples stay under the same license.
 
 The landing page image is a time slice of the same film, built by `spikes/chrono.py`: one column of pixels from each frame, side by side, so the jumps draw their own arcs. Nothing is plotted on it.
 
@@ -98,4 +110,4 @@ uv run pytest
 
 ## Spending limits
 
-The Meta Model API has no hard spend cap, so Gauge keeps its own ledger and refuses paid calls past `GAUGE_BUDGET_USD`, which defaults to 100. Each visitor is limited to 12 runs per hour.
+The Meta Model API has no hard spend cap, so Gauge keeps its own ledger and refuses paid calls past `GAUGE_BUDGET_USD`, which defaults to 25. Each visitor is limited to 12 runs per hour.

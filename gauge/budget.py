@@ -79,4 +79,4 @@ class VisitorLimiter:
 
 def default_ledger() -> Ledger:
     root = Path(__file__).resolve().parent.parent
-    return Ledger(root / "data" / "spend.json", float(os.environ.get("GAUGE_BUDGET_USD", "100")))
+    return Ledger(root / "data" / "spend.json", float(os.environ.get("GAUGE_BUDGET_USD", "25")))

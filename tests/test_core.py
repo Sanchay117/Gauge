@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from gauge.budget import BudgetExceeded, Ledger, RateLimited, VisitorLimiter, sam_cost
-from gauge.laws import fit_law, select_law, verify
+from gauge.laws import fit_law, select_law, speed_factor, verify
 from gauge.measure import (Series, active_window, build_series, clean_track, motion_window, quality_warnings,
                            scale_from_reference)
 from gauge.meta_api import parse_tracks, point_prompt
@@ -13,6 +13,26 @@ RNG = np.random.default_rng(7)
 
 def box(frame, x, y):
     return {"frame": frame, "x1": x - 10, "x2": x + 10, "y1": y - 10, "y2": y + 10}
+
+
+def test_motion_window_sees_a_whole_arc_through_repeated_frames():
+    sample_t = np.arange(17) * 0.04
+    height = -0.5 * 9.81 * (sample_t - 0.32) ** 2 + 0.5
+    t = np.arange(170) * 0.04
+    held = np.repeat(height, 10)
+    series = Series(t, np.zeros(170), held)
+    start, end = motion_window(series, "y")
+    assert end - start > 5.5
+
+
+def test_speed_factor_recovers_a_tenfold_slowdown():
+    assert speed_factor({"a": {"run_1": -10.0, "run_2": -0.1}}) == pytest.approx(0.1)
+
+
+def test_speed_factor_stays_quiet_for_faster_or_matching_clips():
+    assert speed_factor({"a": {"run_1": -1.64, "run_2": -10.3}}) is None
+    assert speed_factor({"a": {"run_1": -9.8, "run_2": -9.7}}) is None
+    assert speed_factor({"tau": {"run_1": 1.0, "run_2": 3.0}}) is None
 
 
 def test_slice_takes_a_column_for_vertical_motion():

@@ -14,11 +14,16 @@ const NASA_NOTE = "Apollo 16 footage from NASA, digitized by Ken Glover. Use the
 const NASA_CREDIT = "Film: NASA, Apollo 16, digitized by Ken Glover";
 // Each sample opens on the frame where the object is easiest to tap.
 const SAMPLES = {
-  jump_1: { metres: 0.914, frame: 48, note: NASA_NOTE, credit: NASA_CREDIT },
+  // No preset length here: the spoken narration sets it through Muse Voice and Spark.
+  jump_1: { metres: "", frame: 48, note: `${NASA_NOTE} The spoken narration is synthetic and was added for this sample.`, credit: NASA_CREDIT },
   jump_2: { metres: 0.914, frame: 48, note: NASA_NOTE, credit: NASA_CREDIT },
   throw: {
     metres: 0.75, frame: 9, credit: "Throw: Rhetos, Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0",
-    note: "A ball thrown upward on Earth, by Rhetos and Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0. Cropped and restored from slow motion to real time. Tap the 0 and 75 marks on the board as the reference, 0.75 m apart. The ball flies in front of the board, so it reads slightly large.",
+    note: "A ball thrown upward on Earth, by Rhetos and Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0. Cropped and restored from slow motion to real time. Tap the 0 and 75 marks on the board as the reference, 0.75 m apart. The ball probably flies in front of the board, so it may read slightly large.",
+  },
+  throw_slow: {
+    metres: 0.75, frame: 86, credit: "Throw: Rhetos, Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0",
+    note: "The same throw, left at the slow motion speed of the original video. Tap the ball, then the 0 and 75 marks on the board.",
   },
 };
 
@@ -195,6 +200,8 @@ function renderVerdict(run) {
   line.textContent = v.passed ? "✓ The law held" : "✕ The law broke";
   showSlice("slice-2", run);
   $("verdict-text").textContent = v.explanation || v.reason;
+  $("verdict-speed").hidden = !v.speed;
+  if (v.speed) $("verdict-speed").textContent = `If both clips share one gravity, this one plays at ${v.speed.toFixed(2)}× the speed of run 1.`;
   const head = "<tr><th>Constant</th><th>Run 1</th><th>Run 2</th><th>Difference</th></tr>";
   $("verdict-table").innerHTML = head;
   for (const [name, c] of Object.entries(v.constants)) {
@@ -498,9 +505,9 @@ async function init() {
     $("load-hint").hidden = false;
     $("load-heading").textContent = "Now try to break it.";
     $("load-lede").textContent = "Give Gauge a second recording. The law from run 1 stays frozen and has to predict it.";
-    $("sample").textContent = "Use the second jump";
-    $("sample").onclick = () => loadSample("jump_2");
-    $("sample-earth").hidden = !state.hasEarth;
+    $("sample").textContent = state.speedCheck ? "Use the slowed copy" : "Use the second jump";
+    $("sample").onclick = () => loadSample(state.speedCheck ? "throw_slow" : "jump_2");
+    $("sample-earth").hidden = !state.hasEarth || state.speedCheck;
     $("sample-note").hidden = true;
     $("load").classList.add("compact");
     $("load").hidden = false;
@@ -515,6 +522,10 @@ async function init() {
   }
   state.hasEarth = samples.includes("throw");
   $("sample-earth").onclick = () => loadSample("throw");
+  $("sample-speed").onclick = () => {
+    state.speedCheck = true;
+    loadSample("throw");
+  };
 }
 
 init();

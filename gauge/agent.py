@@ -179,8 +179,12 @@ def _fallback(analysis: Analysis) -> dict:
     return _finding(args, entry, analysis)
 
 
-def explain_verdict(client: MetaClient, finding: dict, verdict: Verdict, first: str, second: str) -> str:
+def explain_verdict(client: MetaClient, finding: dict, verdict: Verdict, first: str, second: str,
+                    speed: float | None = None) -> str:
+    clock = (f"Code found that if both runs share one gravity, run 2 plays at {speed:.2f} times the speed of run 1, "
+             "so give altered playback speed as the likely cause when the two recordings look alike. " if speed else "")
     prompt = (
+        f"{clock}"
         f"An experiment found {finding['quantity']}. Run 1 showed: {first}. Run 2 showed: {second}. "
         f"Run 2 was held out and scored by code: {json.dumps(verdict.to_dict())}. "
         "In two plain sentences say what this means and, if it failed, the most likely cause. "

@@ -13,6 +13,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "data" / "earth" / "throw.webm"
 DEST = ROOT / "samples" / "throw.mp4"
+SLOWED = ROOT / "samples" / "throw_slow.mp4"
 FRAMES = list(range(256, 457, 10))
 CROP = (610, 1080, 970, 0)
 FPS = 25
@@ -21,6 +22,11 @@ FPS = 25
 def main() -> None:
     picks = "+".join(rf"eq(n\,{n})" for n in FRAMES)
     width, height, left, top = CROP
+    # The slowed copy keeps the source's own slow motion, as a test for the speed check.
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(SOURCE), "-an", "-vf",
+                    rf"select=between(n\,{FRAMES[0]}\,{FRAMES[-1] + 9}),crop={width}:{height}:{left}:{top},"
+                    f"setpts=N/{FPS}/TB,format=yuv420p", "-r", str(FPS), "-c:v", "libx264", "-crf", "20",
+                    "-movflags", "+faststart", str(SLOWED)], check=True)
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(SOURCE), "-an", "-vf",
                     f"select='{picks}',crop={width}:{height}:{left}:{top},setpts=N/{FPS}/TB,format=yuv420p",
                     "-r", str(FPS), "-c:v", "libx264", "-crf", "16", "-movflags", "+faststart", str(DEST)], check=True)

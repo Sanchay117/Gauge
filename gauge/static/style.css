@@ -53,6 +53,9 @@ h1 { margin: 0; font: 300 clamp(50px, 8.6vw, 136px)/0.96 var(--sans); letter-spa
 .doveria-body p { margin: 0 0 14px; }
 .doveria-body .big { font: 300 32px/1.15 var(--sans); color: var(--ink); }
 #story h2 { margin: 0; max-width: 18em; font: 300 clamp(36px, 5.4vw, 80px)/1.04 var(--sans); letter-spacing: -0.03em; color: var(--ink); text-transform: none; }
+.lie-body { margin-top: 18px; max-width: 36em; color: var(--ink-2); }
+.lie-body p { margin: 0 0 20px; }
+.speed { font: 300 25px/1.2 var(--sans); color: var(--ink); margin-bottom: 10px !important; }
 .rule-grid { margin-top: 44px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 40px; }
 .rule-grid > div { border-top: 1px solid var(--ink-3); padding-top: 12px; }
 .rule-grid .only-code { border-top: 3px solid var(--fit); padding-top: 10px; }

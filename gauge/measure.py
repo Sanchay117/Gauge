@@ -9,6 +9,7 @@ MIN_HOLD_SECONDS = 0.15
 MAX_TURN_SECONDS = 0.5
 ARC_TOLERANCE = 0.03
 MIN_ARC_SAMPLES = 12
+HELD_TOLERANCE = 0.005
 
 
 @dataclass
@@ -129,8 +130,22 @@ def flight_window(series: Series, axis: str) -> tuple[float, float]:
     return float(t[best[0]]), float(t[best[1]])
 
 
+def without_held_frames(series: Series, axis: str) -> Series:
+    """Slowed video repeats frames, and the steps that leave look like stops, so keep one of each."""
+    values = series.axis(axis)
+    tolerance = HELD_TOLERANCE * float(np.ptp(values))
+    keep = [0]
+    for i in range(1, len(values)):
+        if abs(values[i] - values[keep[-1]]) > tolerance:
+            keep.append(i)
+    if len(keep) < MIN_ARC_SAMPLES or len(keep) > 0.5 * len(values):
+        return series
+    return Series(series.t[keep], series.x[keep], series.y[keep])
+
+
 def motion_window(series: Series, axis: str) -> tuple[float, float]:
     """The active window, narrowed to the flight when it holds more than one arc."""
+    series = without_held_frames(series, axis)
     start, end = active_window(series, axis)
     part = series.window(start, end)
     if len(part.t) >= MIN_ARC_SAMPLES:

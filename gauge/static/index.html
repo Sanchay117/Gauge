@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=6">
+<link rel="stylesheet" href="/style.css?v=7">
 </head>
 <body>
 <header class="bar">
@@ -68,6 +68,14 @@
         <tr><th>Moon</th><th>should be</th><th>was</th><th>apart</th></tr>
         <tr><td>Jump 2</td><td>1.61</td><td>1.60</td><td>0.9%</td></tr>
       </table>
+    </div>
+  </section>
+
+  <section class="lie" id="lie">
+    <h2>Gravity doesn't lie.</h2>
+    <div class="lie-body">
+      <p>Slow a video down tenfold and gravity looks a hundred times weaker. So a video's physics carries the mark of its clock. Gauge learns the law from one recording, reads a second against it, and works out how far the clock was bent.</p>
+      <div class="row"><button id="sample-speed">Catch a slowed clip</button></div>
     </div>
   </section>
 
@@ -189,6 +197,7 @@
       <figure class="run-slice">
         <img id="slice-2" alt="Time slice of run 2: one line of pixels through the object from each frame, side by side">
       </figure>
+      <p class="speed" id="verdict-speed" hidden></p>
       <p id="verdict-text"></p>
       <button id="card-verdict" class="quiet small">Download card</button>
       <table id="verdict-table"></table>
@@ -202,6 +211,6 @@
   <span>Built with SAM 3.1, Muse Spark and Muse Voice Transcribe.</span>
 </footer>
 <script src="/film.js?v=2"></script>
-<script src="/app.js?v=7"></script>
+<script src="/app.js?v=8"></script>
 </body>
 </html>

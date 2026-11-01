@@ -121,6 +121,17 @@ def select_law(t: np.ndarray, y: np.ndarray, names: list[str] | None = None) -> 
     return sorted(fits, key=lambda f: f.aicc)
 
 
+def speed_factor(constants: dict[str, dict], slowed_below: float = 0.7) -> float | None:
+    """Playback speed of run 2 relative to run 1, if both share one gravity.
+
+    Stretching time by k divides an acceleration by k², so the speed is the root of the ratio.
+    """
+    if "a" not in constants or constants["a"]["run_1"] == 0:
+        return None
+    speed = float(np.sqrt(abs(constants["a"]["run_2"] / constants["a"]["run_1"])))
+    return speed if speed < slowed_below else None
+
+
 @dataclass
 class Verdict:
     passed: bool

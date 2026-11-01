@@ -1,0 +1,6 @@
+.env
+.venv
+data
+spikes
+tests
+__pycache__

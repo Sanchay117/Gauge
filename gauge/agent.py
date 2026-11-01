@@ -179,10 +179,13 @@ def _fallback(analysis: Analysis) -> dict:
     return _finding(args, entry, analysis)
 
 
-def explain_verdict(client: MetaClient, finding: dict, verdict: Verdict) -> str:
+def explain_verdict(client: MetaClient, finding: dict, verdict: Verdict, first: str, second: str) -> str:
     prompt = (
-        f"An experiment found {finding['quantity']}. A held-out second run was scored by code: {json.dumps(verdict.to_dict())}. "
-        "In two plain sentences say what this means and, if it failed, the most likely experimental cause. "
+        f"An experiment found {finding['quantity']}. Run 1 showed: {first}. Run 2 showed: {second}. "
+        f"Run 2 was held out and scored by code: {json.dumps(verdict.to_dict())}. "
+        "In two plain sentences say what this means and, if it failed, the most likely cause. "
+        "If the two recordings show different situations, such as different places or objects, say that first. "
+        "Each difference is a fraction of the run 1 value, so 0.5 means 50%, and it is not in sigma. "
         "Do not change or restate the pass or fail decision differently. Write numbers as digits with three significant figures. "
         "Only suggest causes that fit a video recording, not sensors. Do not use em dashes."
     )

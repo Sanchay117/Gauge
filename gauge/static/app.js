@@ -1,5 +1,5 @@
 const $ = (id) => document.getElementById(id);
-const state = { runs: [null, null], index: 0, mode: "object", refPoints: [], polling: false, tracking: false };
+const state = { runs: [null, null], credits: [null, null], index: 0, mode: "object", refPoints: [], polling: false, tracking: false };
 const current = () => state.runs[state.index];
 
 const LAW_FUNCTIONS = {
@@ -10,7 +10,17 @@ const LAW_FUNCTIONS = {
 };
 const UNITS = { a: "m/s²", v: "m/s", tau: "s", omega: "rad/s", gamma: "1/s", period_s: "s" };
 const GRAVITY = [["Moon", 1.62], ["Mars", 3.71], ["Earth", 9.81]];
-const SAMPLE_FRAME = 48;
+const NASA_NOTE = "Apollo 16 footage from NASA, digitized by Ken Glover. Use the astronaut's backpack as the reference: tap its top and bottom. The stacked life support units are about 0.914 m tall. That size is only known to about 5%, and the error bar does not include it.";
+const NASA_CREDIT = "Film: NASA, Apollo 16, digitized by Ken Glover";
+// Each sample opens on the frame where the object is easiest to tap.
+const SAMPLES = {
+  jump_1: { metres: 0.914, frame: 48, note: NASA_NOTE, credit: NASA_CREDIT },
+  jump_2: { metres: 0.914, frame: 48, note: NASA_NOTE, credit: NASA_CREDIT },
+  throw: {
+    metres: 0.75, frame: 9, credit: "Throw: Rhetos, Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0",
+    note: "A ball thrown upward on Earth, by Rhetos and Mathe-AC Lernwerkstatt Aachen, CC BY-SA 4.0. Cropped and restored from slow motion to real time. Tap the 0 and 75 marks on the board as the reference, 0.75 m apart. The ball flies in front of the board, so it reads slightly large.",
+  },
+};
 
 async function api(path, options = {}) {
   const res = await fetch(path, options);
@@ -165,6 +175,7 @@ function renderFinding() {
   unit.textContent = UNITS[f.parameter] || "";
   $("value").append(unit);
   drawRuler(f);
+  showSlice("slice-1", run);
   $("law").textContent = `${f.fit.law.replaceAll("_", " ")}: ${f.fit.equation}. ${f.fit.n} samples, R² ${f.fit.r2.toFixed(4)}, scatter ${(f.fit.rms_m * 1000).toFixed(2)} mm.`;
   $("explanation").textContent = f.explanation;
   $("next-run").textContent = f.next_run;
@@ -182,6 +193,7 @@ function renderVerdict(run) {
   const line = $("verdict-line");
   line.className = `verdict ${v.passed ? "pass" : "fail"}`;
   line.textContent = v.passed ? "✓ The law held" : "✕ The law broke";
+  showSlice("slice-2", run);
   $("verdict-text").textContent = v.explanation || v.reason;
   const head = "<tr><th>Constant</th><th>Run 1</th><th>Run 2</th><th>Difference</th></tr>";
   $("verdict-table").innerHTML = head;
@@ -193,6 +205,73 @@ function renderVerdict(run) {
   $("verdict-rms").textContent = `Law frozen from run 1: ${(v.held_rms * 1000).toFixed(2)} mm scatter, across ${v.n} samples. Free fit to run 2: ${(v.free_rms * 1000).toFixed(2)} mm.`;
   $("verdict-warnings").hidden = !v.warnings.length;
   $("verdict-warnings").textContent = v.warnings.join(". ");
+}
+
+function showSlice(id, run) {
+  const src = `/api/runs/${run.id}/slice.jpg`;
+  if ($(id).getAttribute("src") !== src) $(id).src = src;
+}
+
+function drawCover(ctx, image, x, y, width, height) {
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const w = width / scale, h = height / scale;
+  ctx.drawImage(image, (image.naturalWidth - w) / 2, (image.naturalHeight - h) / 2, w, h, x, y, width, height);
+}
+
+async function downloadCard() {
+  const f = state.runs[0].finding, verdict = state.runs[1]?.verdict;
+  const canvas = document.createElement("canvas");
+  canvas.width = 1200;
+  canvas.height = 630;
+  const ctx = canvas.getContext("2d");
+  await Promise.all(["300 96px Jost", "500 20px Jost", "16px 'Courier Prime'"].map((font) => document.fonts.load(font)));
+  const images = [$("slice-1"), ...(verdict ? [$("slice-2")] : [])];
+  await Promise.all(images.map((image) => image.decode()));
+
+  ctx.fillStyle = "#0b0b0c";
+  ctx.fillRect(0, 0, 1200, 630);
+  const top = 250, height = 340, share = 1200 / images.length;
+  images.forEach((image, i) => drawCover(ctx, image, i * share, top, share - (i < images.length - 1 ? 2 : 0), height));
+  const fade = ctx.createLinearGradient(0, top, 0, top + 60);
+  fade.addColorStop(0, "#0b0b0c");
+  fade.addColorStop(1, "rgba(11, 11, 12, 0)");
+  ctx.fillStyle = fade;
+  ctx.fillRect(0, top, 1200, 60);
+
+  ctx.fillStyle = "#e9e7e1";
+  ctx.font = "500 20px Jost";
+  ctx.letterSpacing = "7px";
+  ctx.fillText("GAUGE", 48, 62);
+  ctx.letterSpacing = "-3px";
+  ctx.font = "300 96px Jost";
+  const value = $("value").firstChild.textContent.trim();
+  ctx.fillText(value, 48, 172);
+  const end = ctx.measureText(value).width + 48;
+  ctx.letterSpacing = "0px";
+  ctx.font = "300 30px Jost";
+  ctx.fillStyle = "#aeada8";
+  ctx.fillText(UNITS[f.parameter] || "", end + 14, 172);
+  ctx.font = "16px 'Courier Prime'";
+  ctx.fillText(f.quantity, 48, 212);
+  if (verdict) {
+    ctx.textAlign = "right";
+    ctx.font = "300 40px Jost";
+    ctx.fillStyle = verdict.passed ? "#4cc38a" : "#f2807c";
+    ctx.fillText(verdict.passed ? "The law held" : "The law broke", 1152, 172);
+    ctx.textAlign = "left";
+  }
+  ctx.fillStyle = "#85847f";
+  ctx.font = "15px 'Courier Prime'";
+  const credits = [...new Set(state.credits.filter(Boolean))];
+  ctx.fillText(credits.join(". ") || "Measured from video by Gauge", 48, 614);
+
+  canvas.toBlob((blob) => {
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "gauge-result.png";
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }, "image/png");
 }
 
 function drawRuler(f) {
@@ -387,14 +466,16 @@ function showLoadError(message) {
   $("load-error").hidden = !message;
 }
 
-async function loadSample() {
+async function loadSample(name) {
   showError(null);
   try {
-    startRun(await post(`/api/samples/jump_${state.index + 1}`));
-    $("metres").value = "0.914";
+    const sample = SAMPLES[name];
+    startRun(await post(`/api/samples/${name}`));
+    $("metres").value = sample.metres;
+    $("sample-note").textContent = sample.note;
     $("sample-note").hidden = false;
-    // Open on the top of the jump, where the astronaut is easiest to tap.
-    $("scrub").value = SAMPLE_FRAME;
+    state.credits[state.index] = sample.credit;
+    $("scrub").value = sample.frame;
     seek();
   } catch (err) {
     showLoadError(err.message);
@@ -408,6 +489,8 @@ async function init() {
   $("overlay").onclick = onTap;
   $("go").onclick = onGo;
   $("restart-ref").onclick = () => { state.refPoints = []; render(); };
+  $("card").onclick = downloadCard;
+  $("card-verdict").onclick = downloadCard;
   $("start-run-2").onclick = () => {
     state.index = 1;
     $("load-title").textContent = "Run 2";
@@ -416,6 +499,9 @@ async function init() {
     $("load-heading").textContent = "Now try to break it.";
     $("load-lede").textContent = "Give Gauge a second recording. The law from run 1 stays frozen and has to predict it.";
     $("sample").textContent = "Use the second jump";
+    $("sample").onclick = () => loadSample("jump_2");
+    $("sample-earth").hidden = !state.hasEarth;
+    $("sample-note").hidden = true;
     $("load").classList.add("compact");
     $("load").hidden = false;
     document.querySelector("main").hidden = true;
@@ -425,8 +511,10 @@ async function init() {
   const samples = await api("/api/samples").catch(() => []);
   if (samples.includes("jump_1") && samples.includes("jump_2")) {
     $("sample").hidden = false;
-    $("sample").onclick = loadSample;
+    $("sample").onclick = () => loadSample("jump_1");
   }
+  state.hasEarth = samples.includes("throw");
+  $("sample-earth").onclick = () => loadSample("throw");
 }
 
 init();

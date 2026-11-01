@@ -6,8 +6,32 @@ from gauge.laws import fit_law, select_law, verify
 from gauge.measure import (Series, active_window, build_series, clean_track, motion_window, quality_warnings,
                            scale_from_reference)
 from gauge.meta_api import parse_tracks, point_prompt
+from gauge.timeslice import choose_axis, line_path, take_line
 
 RNG = np.random.default_rng(7)
+
+
+def box(frame, x, y):
+    return {"frame": frame, "x1": x - 10, "x2": x + 10, "y1": y - 10, "y2": y + 10}
+
+
+def test_slice_takes_a_column_for_vertical_motion():
+    assert choose_axis([box(0, 100, 50), box(1, 101, 90), box(2, 102, 140)]) == "y"
+    assert choose_axis([box(0, 50, 100), box(1, 90, 101), box(2, 140, 102)]) == "x"
+
+
+def test_slice_follows_the_object_across_missing_frames():
+    first, path = line_path([box(3, 100, 50), box(5, 104, 60), box(9, 112, 90)], "y")
+    assert first == 3
+    assert len(path) == 7
+    assert path[1] == pytest.approx(102)
+
+
+def test_slice_line_stays_inside_the_frame():
+    frame = np.arange(100).reshape(10, 10)
+    assert len(take_line(frame, 9.5, 4, "y")) == 10
+    assert take_line(frame, 9.5, 4, "y")[0] == pytest.approx(7.5)
+    assert len(take_line(frame, 0, 4, "x")) == 10
 
 
 def noisy(values, sd=0.001):

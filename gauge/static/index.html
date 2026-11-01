@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=5">
+<link rel="stylesheet" href="/style.css?v=6">
 </head>
 <body>
 <header class="bar">
@@ -28,6 +28,7 @@
       <p class="lede" id="load-lede">Gauge pulled 1.6 m/s² out of a 1972 film. It measures anything that moves on video, then tries to prove itself wrong.</p>
       <div class="row">
         <button id="sample" hidden>Measure it yourself</button>
+        <button id="sample-earth" hidden>Test it on Earth</button>
         <button id="pick" class="quiet">Use my own video</button>
       </div>
       <input id="file" type="file" accept="video/*" hidden>
@@ -101,12 +102,13 @@
 
   <section class="record" id="record">
     <h2>It also says no.</h2>
-    <p class="aside">Real clips from a physics teaching pack, tested on Earth. The clips are not part of this project.</p>
+    <p class="aside">Real clips, tested on Earth. Ball drop and pendulum come from a physics teaching pack and are not part of this project. The last test ships with Gauge, so you can run it yourself.</p>
     <table class="trials">
       <tr><td>Ball drop</td><td>9.69 ± 0.05 m/s²</td><td></td></tr>
       <tr><td>Drop law on a ball thrown upward</td><td>1.3% apart</td><td class="held">Held</td></tr>
       <tr><td>Pendulum, 1 m</td><td>2.04 s against about 2.06 s</td><td></td></tr>
       <tr><td>Drop law on the pendulum</td><td>a different motion</td><td class="broke">Broke</td></tr>
+      <tr><td>Moon's law on a ball thrown on Earth</td><td>1.6 against about 10 m/s²</td><td class="broke">Broke</td></tr>
     </table>
   </section>
 
@@ -132,7 +134,7 @@
       </div>
       <input id="scrub" type="range" min="0" value="0" aria-label="Frame">
       <p class="prompt" id="prompt"></p>
-      <p class="note" id="sample-note" hidden>Apollo 16 footage from NASA, digitized by Ken Glover. Use the astronaut's backpack as the reference: tap its top and bottom. The stacked life support units are about 0.914 m tall. That size is only known to about 5%, and the error bar does not include it.</p>
+      <p class="note" id="sample-note" hidden></p>
       <div class="row" id="reference-row" hidden>
         <label for="metres">Reference length</label>
         <span class="unit-input"><input id="metres" type="number" step="0.001" min="0" placeholder="0.30"><span>m</span></span>
@@ -160,6 +162,11 @@
       <p class="label" id="quantity"></p>
       <div class="hero" id="value"></div>
       <div id="ruler"></div>
+      <figure class="run-slice">
+        <img id="slice-1" alt="Time slice of run 1: one line of pixels through the object from each frame, side by side">
+        <figcaption>Your clip as a time slice. One line of pixels from each frame, nothing plotted.</figcaption>
+      </figure>
+      <button id="card" class="quiet small">Download card</button>
       <p class="hint" id="law"></p>
       <div class="legend">
         <span><i class="swatch" style="background:var(--measured)"></i>Measured</span>
@@ -179,7 +186,11 @@
     <section id="verdict" class="feature" hidden>
       <h2>Verification</h2>
       <div class="verdict" id="verdict-line"></div>
+      <figure class="run-slice">
+        <img id="slice-2" alt="Time slice of run 2: one line of pixels through the object from each frame, side by side">
+      </figure>
       <p id="verdict-text"></p>
+      <button id="card-verdict" class="quiet small">Download card</button>
       <table id="verdict-table"></table>
       <p class="hint" id="verdict-rms"></p>
       <p class="warn" id="verdict-warnings" hidden></p>
@@ -187,10 +198,10 @@
   </div>
 </main>
 <footer>
-  <span>Sample footage: Apollo 16 jump salute, NASA, digitized by Ken Glover, from the <a href="https://apollojournals.org/alsj/a16/a16salute.mpg">Apollo Lunar Surface Journal</a>. No endorsement implied.</span>
+  <span>Sample footage: Apollo 16 jump salute, NASA, digitized by Ken Glover, from the <a href="https://apollojournals.org/alsj/a16/a16salute.mpg">Apollo Lunar Surface Journal</a>. No endorsement implied. Earth throw: <a href="https://commons.wikimedia.org/wiki/File:Senkrechter_Wurf_nach_oben_(Steigzeit).webm">Rhetos, Mathe-AC Lernwerkstatt Aachen</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>, cropped and restored to real time.</span>
   <span>Built with SAM 3.1, Muse Spark and Muse Voice Transcribe.</span>
 </footer>
 <script src="/film.js?v=2"></script>
-<script src="/app.js?v=6"></script>
+<script src="/app.js?v=7"></script>
 </body>
 </html>

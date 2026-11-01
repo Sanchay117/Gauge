@@ -16,6 +16,7 @@ from .laws import Fit, verify
 from .measure import (Series, build_series, motion_window, clean_track, quality_warnings,
                       scale_from_reference, scale_uncertainty)
 from .meta_api import MetaClient, point_prompt
+from .timeslice import build as build_slice
 from .video import Clip, extract_wav, nearest_frame, normalise
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -196,8 +197,24 @@ def track(run_id: str, body: TrackRequest) -> dict:
     if not tracks:
         raise HTTPException(422, "SAM could not lock on, try tapping a clearer frame")
     run.track = max(tracks.values(), key=len)
+    slice_path(run).unlink(missing_ok=True)
     refresh_series(run)
     return run.to_dict()
+
+
+def slice_path(run: Run) -> Path:
+    return run.clip.path.with_name("slice.jpg")
+
+
+@app.get("/api/runs/{run_id}/slice.jpg")
+def run_slice(run_id: str) -> FileResponse:
+    run = get_run(run_id)
+    if not run.track:
+        raise HTTPException(409, "tap the object first")
+    path = slice_path(run)
+    if not path.exists():
+        build_slice(run.clip.path, run.clip.width, run.clip.height, run.track, path)
+    return FileResponse(path, media_type="image/jpeg")
 
 
 @app.post("/api/runs/{run_id}/reference")
@@ -264,7 +281,9 @@ def verify_run(run_id: str, body: VerifyRequest) -> dict:
         verdict = verify(first.fit, part.t - part.t[0], part.axis(axis))
         run.verdict = {**verdict.to_dict(), "warnings": quality_warnings(part, axis, len(part.t)),
                        "window": [start, end], "axis": axis, "law": first.fit.law}
-        run.verdict["explanation"] = agent.explain_verdict(client, first.finding, verdict)
+        run.verdict["explanation"] = agent.explain_verdict(client, first.finding, verdict,
+                                                           first.setup.get("experiment", "unknown"),
+                                                           run.setup.get("experiment", "unknown"))
 
     spawn(run, "verifying", work)
     return run.to_dict()

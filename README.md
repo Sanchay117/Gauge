@@ -43,9 +43,22 @@ Tested on clips from the Tracker physics sample pack, which are not included in 
 | Pendulum period, 1 m length | 2.04 s against about 2.06 s predicted at this swing size |
 | Law from the drop tested on the pendulum | Correctly failed |
 
+### Moon against Earth
+
+The sample `throw` is a ball thrown upward in front of a 75 cm scale, run as run 2 against the Moon's law from jump 1.
+
+| Test | Result |
+| --- | --- |
+| Moon's law tested on the Earth throw | Correctly failed: 1.64 frozen, 10.3 m/s² measured |
+| Free fit to the throw | 10.3 m/s², with 7 mm scatter across 19 samples |
+
+The throw reads about 5% high against 9.81 m/s². The scale comes from the board, and the ball probably flies in front of it, which would make its motion look larger. Read that figure as a sanity check, not a measurement of gravity.
+
 ## Footage credit
 
 Sample clips are cut from the Apollo 16 jump salute by NASA, digitized by Ken Glover, from the [Apollo Lunar Surface Journal](https://apollojournals.org/alsj/a16/a16salute.mpg). Use here does not imply endorsement by NASA.
+
+`samples/throw.mp4` is cut from [Senkrechter Wurf nach oben (Steigzeit)](https://commons.wikimedia.org/wiki/File:Senkrechter_Wurf_nach_oben_(Steigzeit).webm) by Rhetos, recorded at Mathe-AC Lernwerkstatt Aachen, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). It was cropped to the board and restored from 10 times slow motion to real time by `spikes/earth_cut.py`. That sample stays under the same license.
 
 The landing page image is a time slice of the same film, built by `spikes/chrono.py`: one column of pixels from each frame, side by side, so the jumps draw their own arcs. Nothing is plotted on it.
 

@@ -138,6 +138,10 @@ input[type=range]:not(.sr) { width: 100%; margin: 12px 0 4px; accent-color: var(
 .mark-line { stroke: var(--ink); }
 .needle { stroke: var(--fit); stroke-width: 2.5; }
 .needle-band { fill: var(--fit); fill-opacity: 0.28; }
+.run-slice { margin: 16px 0 12px; }
+.run-slice img { display: block; width: 100%; height: auto; background: var(--panel); }
+.run-slice figcaption { margin-top: 6px; font: 14px/1.4 var(--type); color: var(--ink-3); }
+#verdict-text + button { margin-top: 14px; }
 .legend { display: flex; gap: 16px; font-size: 15px; color: var(--ink-2); margin: 16px 0 4px; }
 .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
 .swatch.line { height: 2px; width: 16px; border-radius: 1px; vertical-align: middle; }

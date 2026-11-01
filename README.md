@@ -26,9 +26,9 @@ The sample is the Apollo 16 jump salute from 1972. Gauge measures the first jump
 
 | Test | Result |
 | --- | --- |
-| Jump 1, acceleration | 1.61 m/s² in two repeat runs, against the accepted 1.62 m/s² |
-| Jump 2, free fit | 1.69 m/s², a 5% difference |
-| Jump 1 law tested on jump 2 | Passed |
+| Jump 1, acceleration | 1.61 m/s² in repeat runs, against the accepted 1.62 m/s² |
+| Jump 2, free fit | 1.60 to 1.69 m/s² across repeat runs |
+| Jump 1 law tested on jump 2 | Passed on every run |
 
 The scale is the weak point. It assumes the backpack stack is 0.914 m tall (a 26 inch PLSS plus a 10 inch OPS) and that the tracked box spans it. Fitting different windows by hand moved the result by about 5%, and the app's error bar covers only the fit and the taps, so read this as about 1.65 ± 0.15 m/s², clearly lunar and about a sixth of Earth's gravity. Nothing here was calibrated from a published jump height, because those figures assume lunar gravity.
 

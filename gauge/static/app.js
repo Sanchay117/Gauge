@@ -459,13 +459,14 @@ async function onGo() {
 async function upload(file) {
   const form = new FormData();
   form.append("file", file);
-  $("busy").textContent = "Uploading…";
   showError(null);
+  showPreparing(true);
   try {
     startRun(await api("/api/runs", { method: "POST", body: form }));
   } catch (err) {
     showLoadError(err.message);
   }
+  showPreparing(false);
 }
 
 function showLoadError(message) {
@@ -473,8 +474,15 @@ function showLoadError(message) {
   $("load-error").hidden = !message;
 }
 
+function showPreparing(on) {
+  ["sample", "sample-earth", "pick", "sample-again", "sample-speed"].forEach((id) => { $(id).disabled = on; });
+  $("load-busy").textContent = on ? "Preparing the clip. This can take about 30 seconds." : "";
+  if (on) window.scrollTo(0, 0);
+}
+
 async function loadSample(name) {
   showError(null);
+  showPreparing(true);
   try {
     const sample = SAMPLES[name];
     startRun(await post(`/api/samples/${name}`));
@@ -487,6 +495,7 @@ async function loadSample(name) {
   } catch (err) {
     showLoadError(err.message);
   }
+  showPreparing(false);
 }
 
 async function init() {

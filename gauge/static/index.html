@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=7">
+<link rel="stylesheet" href="/style.css?v=8">
 </head>
 <body>
 <header class="bar">
@@ -31,6 +31,7 @@
         <button id="sample-earth" hidden>Test it on Earth</button>
         <button id="pick" class="quiet">Use my own video</button>
       </div>
+      <p class="busy" id="load-busy"></p>
       <input id="file" type="file" accept="video/*" hidden>
       <p class="warn" id="load-error" hidden></p>
       <p class="hint" id="load-hint" hidden>Keep the camera still with a ruler in frame, and say its length out loud.</p>
@@ -49,7 +50,7 @@
     <figcaption><span>Not a chart. One column of pixels from each frame of the film, in time order. The two arcs are two jumps.</span><span class="axis" id="axis"></span></figcaption>
   </figure>
   <dl class="ledger" id="ledger">
-    <div><dt>First jump, repeat runs</dt><dd>1.61 to 1.64</dd></div>
+    <div><dt>First jump, repeat runs</dt><dd>1.61 to 1.72</dd></div>
     <div><dt>Second jump, repeat runs</dt><dd>1.60 to 1.69</dd></div>
     <div><dt>Accepted value</dt><dd>1.62 <small>m/s²</small></dd></div>
     <div><dt>First law, tested on the second jump</dt><dd>Held, every run</dd></div>
@@ -211,6 +212,6 @@
   <span>Built with SAM 3.1, Muse Spark and Muse Voice Transcribe.</span>
 </footer>
 <script src="/film.js?v=2"></script>
-<script src="/app.js?v=8"></script>
+<script src="/app.js?v=9"></script>
 </body>
 </html>

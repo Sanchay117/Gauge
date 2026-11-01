@@ -26,7 +26,7 @@ The sample is the Apollo 16 jump salute from 1972. Gauge measures the first jump
 
 | Test | Result |
 | --- | --- |
-| Jump 1, acceleration | 1.61 m/s² in repeat runs, against the accepted 1.62 m/s² |
+| Jump 1, acceleration | 1.61 to 1.64 m/s² across repeat runs, against the accepted 1.62 m/s² |
 | Jump 2, free fit | 1.60 to 1.69 m/s² across repeat runs |
 | Jump 1 law tested on jump 2 | Passed on every run |
 
@@ -46,6 +46,10 @@ Tested on clips from the Tracker physics sample pack, which are not included in 
 ## Footage credit
 
 Sample clips are cut from the Apollo 16 jump salute by NASA, digitized by Ken Glover, from the [Apollo Lunar Surface Journal](https://apollojournals.org/alsj/a16/a16salute.mpg). Use here does not imply endorsement by NASA.
+
+The landing page image is a time slice of the same film, built by `spikes/chrono.py`: one column of pixels from each frame, side by side, so the jumps draw their own arcs. Nothing is plotted on it.
+
+The account of Galileo's folio 116v follows [Torre, "Galileo's experiments with Arduino"](https://indico.ict.inaf.it/event/2338/contributions/15331/).
 
 ## Meta models used
 

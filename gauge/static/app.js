@@ -35,6 +35,9 @@ function startRun(run) {
   $("video-card").hidden = false;
   document.querySelector("main").hidden = false;
   $("load").hidden = true;
+  $("story").hidden = true;
+  $("nav").hidden = true;
+  window.scrollTo(0, 0);
   showLoadError(null);
   $("video-title").textContent = `Run ${state.index + 1}`;
   // The stage must match the video exactly, or taps land on letterbox bars and map to the wrong pixel.
@@ -408,6 +411,8 @@ async function init() {
   $("start-run-2").onclick = () => {
     state.index = 1;
     $("load-title").textContent = "Run 2";
+    $("load-title").hidden = false;
+    $("load-hint").hidden = false;
     $("load-heading").textContent = "Now try to break it.";
     $("load-lede").textContent = "Give Gauge a second recording. The law from run 1 stays frozen and has to predict it.";
     $("sample").textContent = "Use the second jump";
